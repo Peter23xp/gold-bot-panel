@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatProfit(value: number | null): string {
   if (value === null) return '—'
-  const sign = value >= 0 ? '+' : ''
+  const sign = value > 0 ? '+' : ''
   return `${sign}${value.toFixed(2)}`
 }
 

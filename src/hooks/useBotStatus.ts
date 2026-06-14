@@ -5,7 +5,7 @@ import type { BotStatus } from '@/types/api'
 export function useBotStatus(accountId: string | null) {
   return useQuery<BotStatus>({
     queryKey: ['bot-status', accountId],
-    queryFn: () => api.get(`/bot/${accountId}/status`).then(r => r.data),
+    queryFn: () => api.get(`/bot-status/${accountId}`).then(r => r.data),
     enabled: !!accountId,
     refetchInterval: 10000,
   })

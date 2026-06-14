@@ -15,7 +15,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' as const } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] } },
 }
 
 function BotControlButton({
@@ -196,7 +196,7 @@ export function DashboardPage() {
           }}
         >
           <p className="text-xs font-medium mb-4" style={{ color: 'oklch(0.42 0 0)' }}>
-            P&L — last 7 days
+            P&L: last 7 days
           </p>
           <PnlChart points={chart?.points ?? []} />
         </div>
@@ -287,26 +287,26 @@ export function DashboardPage() {
                         {pos.order_type}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.55 0 0)', fontFamily: "var(--font-mono)" }}>
                       {pos.volume}
                     </td>
-                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.55 0 0)', fontFamily: "var(--font-mono)" }}>
                       {pos.price_open}
                     </td>
-                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.70 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.70 0 0)', fontFamily: "var(--font-mono)" }}>
                       {pos.price_current}
                     </td>
-                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.45 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.45 0 0)', fontFamily: "var(--font-mono)" }}>
                       {pos.sl}
                     </td>
-                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.45 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    <td className="px-4 py-2.5 text-sm" style={{ color: 'oklch(0.45 0 0)', fontFamily: "var(--font-mono)" }}>
                       {pos.tp}
                     </td>
                     <td
                       className="px-4 py-2.5 text-sm font-semibold"
                       style={{
                         color: pos.profit >= 0 ? 'oklch(0.70 0.150 155)' : 'oklch(0.57 0.200 25)',
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "var(--font-mono)",
                       }}
                     >
                       {formatProfit(pos.profit)}

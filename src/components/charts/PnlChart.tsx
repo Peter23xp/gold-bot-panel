@@ -22,7 +22,7 @@ function CustomTooltip({ active, payload, label }: {
       <p style={{
         fontSize: '14px',
         fontWeight: 600,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "var(--font-mono)",
         color: val >= 0 ? 'oklch(0.72 0.150 155)' : 'oklch(0.68 0.150 25)',
       }}>
         {val >= 0 ? '+' : ''}{val.toFixed(2)}

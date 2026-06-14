@@ -104,6 +104,7 @@ export function LogsPage() {
           <button
             key={level}
             onClick={() => toggleFilter(level)}
+            aria-pressed={activeFilters.has(level)}
             className="px-2.5 py-1 rounded text-xs font-medium border transition-all duration-150"
             style={activeFilters.has(level) ? activeStyle : inactiveStyle}
           >
@@ -154,7 +155,7 @@ export function LogsPage() {
         style={{
           background: 'oklch(0.05 0 0)',
           border: '1px solid oklch(0.15 0 0)',
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          fontFamily: "var(--font-mono)",
         }}
       >
         {filtered.length === 0 ? (

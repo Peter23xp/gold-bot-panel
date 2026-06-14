@@ -82,14 +82,18 @@ export function TradesPage() {
 
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2">
+        <label htmlFor="trades-date-from" className="sr-only">From date</label>
         <input
+          id="trades-date-from"
           type="date"
           value={dateFrom}
           onChange={e => { setDateFrom(e.target.value); setPage(1) }}
           style={inputStyle}
         />
         <span className="text-xs" style={{ color: 'oklch(0.38 0 0)' }}>to</span>
+        <label htmlFor="trades-date-to" className="sr-only">To date</label>
         <input
+          id="trades-date-to"
           type="date"
           value={dateTo}
           onChange={e => { setDateTo(e.target.value); setPage(1) }}
@@ -200,10 +204,10 @@ export function TradesPage() {
                   onMouseEnter={e => { e.currentTarget.style.background = 'oklch(0.13 0 0)' }}
                   onMouseLeave={e => { e.currentTarget.style.background = i % 2 !== 0 ? 'oklch(0.09 0 0 / 0.4)' : 'transparent' }}
                 >
-                  <td className="px-4 py-2.5 text-xs whitespace-nowrap" style={{ color: 'oklch(0.42 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs whitespace-nowrap" style={{ color: 'oklch(0.42 0 0)', fontFamily: "var(--font-mono)" }}>
                     {new Date(trade.open_time).toISOString().replace('T', ' ').slice(0, 16)} UTC
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.ticket}
                   </td>
                   <td className="px-4 py-2.5">
@@ -217,26 +221,26 @@ export function TradesPage() {
                       {trade.order_type}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.volume}
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.price_open}
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.price_close ?? '—'}
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.sl ?? '—'}
                   </td>
-                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "var(--font-mono)" }}>
                     {trade.tp ?? '—'}
                   </td>
                   <td
                     className="px-4 py-2.5 text-xs font-semibold"
                     style={{
                       color: (trade.profit ?? 0) >= 0 ? 'oklch(0.70 0.150 155)' : 'oklch(0.57 0.200 25)',
-                      fontFamily: "'JetBrains Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                     }}
                   >
                     {formatProfit(trade.profit)}

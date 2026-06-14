@@ -104,7 +104,11 @@ export function SettingsPage() {
                 borderTop: i > 0 ? '1px solid oklch(0.14 0 0)' : undefined,
               }}
             >
-              <label className="text-sm flex-1" style={{ color: 'oklch(0.65 0 0)' }}>
+              <label
+                htmlFor={`setting-${field.key}`}
+                className="text-sm flex-1"
+                style={{ color: 'oklch(0.65 0 0)' }}
+              >
                 {field.label}
                 {field.unit && (
                   <span className="ml-1 text-xs" style={{ color: 'oklch(0.38 0 0)' }}>
@@ -115,6 +119,7 @@ export function SettingsPage() {
 
               {field.type === 'boolean' ? (
                 <button
+                  id={`setting-${field.key}`}
                   onClick={() =>
                     setValues(v => ({
                       ...v,
@@ -130,6 +135,7 @@ export function SettingsPage() {
                   }}
                   role="switch"
                   aria-checked={values[field.key] === 'True'}
+                  aria-label={field.label}
                 >
                   <span
                     className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-200"
@@ -145,6 +151,7 @@ export function SettingsPage() {
               ) : (
                 <div className="relative">
                   <input
+                    id={`setting-${field.key}`}
                     type="number"
                     value={values[field.key] ?? ''}
                     onChange={e =>
@@ -156,7 +163,7 @@ export function SettingsPage() {
                       border: '1px solid oklch(0.22 0 0)',
                       color: 'oklch(0.90 0 0)',
                       outline: 'none',
-                      fontFamily: "'JetBrains Mono', monospace",
+                      fontFamily: "var(--font-mono)",
                     }}
                     onFocus={e => {
                       e.currentTarget.style.borderColor = 'oklch(0.55 0.120 80)'
@@ -220,7 +227,7 @@ export function SettingsPage() {
               className="text-xs"
               style={{ color: 'oklch(0.55 0.120 155)' }}
             >
-              Settings saved — bot restarting…
+              Settings saved. Bot restarting…
             </motion.p>
           )}
           {saveMutation.isError && (

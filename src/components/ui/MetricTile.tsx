@@ -10,7 +10,7 @@ export function MetricTile({ label, value, sub, valueStyle }: MetricTileProps) {
     <div
       className="rounded-xl p-4"
       style={{
-        background: 'oklch(0.105 0 0)',
+        background: 'var(--surface)',
         border: '1px solid oklch(0.18 0 0)',
       }}
     >
@@ -21,7 +21,7 @@ export function MetricTile({ label, value, sub, valueStyle }: MetricTileProps) {
         className="text-2xl font-bold tracking-tight tabular-nums leading-none"
         style={{
           color: 'oklch(0.95 0 0)',
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          fontFamily: "var(--font-mono)",
           ...valueStyle,
         }}
       >

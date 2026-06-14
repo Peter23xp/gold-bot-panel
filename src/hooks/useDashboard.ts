@@ -14,7 +14,7 @@ export function useDashboard(accountId: string | null) {
 export function usePnlChart(accountId: string | null, days = 7) {
   return useQuery<PnlChart>({
     queryKey: ['pnl-chart', accountId, days],
-    queryFn: () => api.get(`/dashboard/${accountId}/pnl/chart?days=${days}`).then(r => r.data),
+    queryFn: () => api.get(`/pnl/${accountId}/chart?days=${days}`).then(r => r.data),
     enabled: !!accountId,
   })
 }
