@@ -54,64 +54,61 @@ export function SettingsPage() {
 
   if (user?.role !== 'admin') {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <ShieldOff size={32} style={{ color: 'oklch(0.22 0 0)' }} strokeWidth={1} />
-        <p className="text-sm" style={{ color: 'oklch(0.38 0 0)' }}>Admin access required</p>
+      <div className="empty-state">
+        <ShieldOff size={32} className="empty-state__icon" strokeWidth={1} />
+        <p className="empty-state__text">Admin access required</p>
       </div>
     )
   }
 
   if (!selectedAccountId) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <Settings size={32} style={{ color: 'oklch(0.22 0 0)' }} strokeWidth={1} />
-        <p className="text-sm" style={{ color: 'oklch(0.38 0 0)' }}>Select an account to manage settings</p>
+      <div className="empty-state">
+        <Settings size={32} className="empty-state__icon" strokeWidth={1} />
+        <p className="empty-state__text">Select an account to manage settings</p>
       </div>
     )
   }
 
   return (
     <motion.div
-      className="max-w-2xl space-y-5"
+      style={{ maxWidth: '672px', display: 'flex', flexDirection: 'column', gap: '20px' }}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div
-        className="rounded-xl overflow-hidden"
-        style={{ background: 'oklch(0.105 0 0)', border: '1px solid oklch(0.18 0 0)' }}
-      >
+      <div className="card">
         {/* Header */}
-        <div
-          className="px-5 py-4"
-          style={{ borderBottom: '1px solid oklch(0.16 0 0)' }}
-        >
-          <p className="text-sm font-semibold" style={{ color: 'oklch(0.90 0 0)' }}>
+        <div className="card__header">
+          <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'oklch(0.90 0 0)' }}>
             Bot Parameters
           </p>
-          <p className="text-xs mt-0.5" style={{ color: 'oklch(0.38 0 0)' }}>
+          <p style={{ fontSize: '0.75rem', marginTop: '2px', color: 'oklch(0.38 0 0)' }}>
             Changes write to .env and restart the container
           </p>
         </div>
 
         {/* Fields */}
-        <div className="p-5 space-y-0">
+        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
           {BOT_SETTING_FIELDS.map((field, i) => (
             <div
               key={field.key}
-              className="flex items-center justify-between gap-6 py-3"
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                padding: '12px 0',
                 borderTop: i > 0 ? '1px solid oklch(0.14 0 0)' : undefined,
               }}
             >
               <label
                 htmlFor={`setting-${field.key}`}
-                className="text-sm flex-1"
-                style={{ color: 'oklch(0.65 0 0)' }}
+                style={{ fontSize: '0.875rem', flex: 1, color: 'oklch(0.65 0 0)' }}
               >
                 {field.label}
                 {field.unit && (
-                  <span className="ml-1 text-xs" style={{ color: 'oklch(0.38 0 0)' }}>
+                  <span style={{ marginLeft: '4px', fontSize: '0.75rem', color: 'oklch(0.38 0 0)' }}>
                     ({field.unit})
                   </span>
                 )}
@@ -126,8 +123,15 @@ export function SettingsPage() {
                       [field.key]: v[field.key] === 'True' ? 'False' : 'True',
                     }))
                   }
-                  className="relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0"
                   style={{
+                    position: 'relative',
+                    width: '40px',
+                    height: '20px',
+                    borderRadius: '9999px',
+                    transition: 'background 200ms',
+                    flexShrink: 0,
+                    border: 'none',
+                    cursor: 'pointer',
                     background:
                       values[field.key] === 'True'
                         ? 'oklch(0.76 0.149 80)'
@@ -138,8 +142,14 @@ export function SettingsPage() {
                   aria-label={field.label}
                 >
                   <span
-                    className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-200"
                     style={{
+                      position: 'absolute',
+                      top: '2px',
+                      left: '2px',
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      transition: 'transform 200ms',
                       background: 'oklch(0.95 0 0)',
                       transform:
                         values[field.key] === 'True'
@@ -149,7 +159,7 @@ export function SettingsPage() {
                   />
                 </button>
               ) : (
-                <div className="relative">
+                <div style={{ position: 'relative' }}>
                   <input
                     id={`setting-${field.key}`}
                     type="number"
@@ -157,22 +167,8 @@ export function SettingsPage() {
                     onChange={e =>
                       setValues(v => ({ ...v, [field.key]: e.target.value }))
                     }
-                    className="w-28 rounded-lg px-3 py-1.5 text-sm text-right tabular-nums transition-all duration-150"
-                    style={{
-                      background: 'oklch(0.13 0 0)',
-                      border: '1px solid oklch(0.22 0 0)',
-                      color: 'oklch(0.90 0 0)',
-                      outline: 'none',
-                      fontFamily: "var(--font-mono)",
-                    }}
-                    onFocus={e => {
-                      e.currentTarget.style.borderColor = 'oklch(0.55 0.120 80)'
-                      e.currentTarget.style.boxShadow = '0 0 0 3px oklch(0.76 0.149 80 / 0.08)'
-                    }}
-                    onBlur={e => {
-                      e.currentTarget.style.borderColor = 'oklch(0.22 0 0)'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
+                    className="input"
+                    style={{ width: '112px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}
                   />
                 </div>
               )}
@@ -182,16 +178,23 @@ export function SettingsPage() {
 
         {/* Footer */}
         <div
-          className="px-5 py-4 flex items-center gap-3"
-          style={{ borderTop: '1px solid oklch(0.16 0 0)' }}
+          style={{
+            padding: '16px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            borderTop: '1px solid oklch(0.16 0 0)'
+          }}
         >
           <button
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 disabled:opacity-50"
+            className="btn"
             style={{
+              padding: '8px 16px',
               background: saved ? 'oklch(0.65 0.140 155)' : 'oklch(0.76 0.149 80)',
               color: 'oklch(0.08 0 0)',
+              borderColor: saved ? 'oklch(0.65 0.140 155)' : 'oklch(0.76 0.149 80)'
             }}
             onMouseEnter={e => {
               if (!saveMutation.isPending && !saved)
@@ -204,7 +207,14 @@ export function SettingsPage() {
           >
             {saveMutation.isPending ? (
               <>
-                <span className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                <span style={{
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '50%',
+                  border: '2px solid currentColor',
+                  borderTopColor: 'transparent',
+                  animation: 'spin 1s linear infinite'
+                }} />
                 Saving…
               </>
             ) : saved ? (
@@ -224,14 +234,13 @@ export function SettingsPage() {
             <motion.p
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xs"
-              style={{ color: 'oklch(0.55 0.120 155)' }}
+              style={{ fontSize: '0.75rem', color: 'oklch(0.55 0.120 155)' }}
             >
               Settings saved. Bot restarting…
             </motion.p>
           )}
           {saveMutation.isError && (
-            <p className="text-xs" style={{ color: 'oklch(0.62 0.180 25)' }}>
+            <p style={{ fontSize: '0.75rem', color: 'oklch(0.62 0.180 25)' }}>
               Failed to save settings
             </p>
           )}

@@ -35,55 +35,36 @@ export function Sidebar() {
   }, [accountOpen])
 
   return (
-    <aside
-      className="fixed left-0 top-0 h-full w-60 flex flex-col z-20"
-      style={{
-        background: 'oklch(0.065 0 0)',
-        borderRight: '1px solid oklch(0.14 0 0)',
-      }}
-    >
+    <aside className="app-shell__sidebar">
       {/* Logo */}
-      <div
-        className="h-14 flex items-center gap-3 px-4 flex-shrink-0"
-        style={{ borderBottom: '1px solid oklch(0.14 0 0)' }}
-      >
-        <div
-          className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
-          style={{
-            background: 'oklch(0.76 0.149 80 / 0.12)',
-            border: '1px solid oklch(0.76 0.149 80 / 0.25)',
-          }}
-        >
-          <TrendingUp size={13} style={{ color: 'oklch(0.76 0.149 80)' }} strokeWidth={2} />
+      <div className="sidebar__logo">
+        <div className="sidebar__logo-icon">
+          <TrendingUp size={13} strokeWidth={2} />
         </div>
         <div>
-          <p className="text-sm font-semibold leading-none tracking-tight" style={{ color: 'oklch(0.95 0 0)' }}>
-            Gold Bot
-          </p>
-          <p className="text-[10px] mt-0.5 font-medium" style={{ color: 'oklch(0.45 0 0)' }}>
-            XAUUSD · Panel
-          </p>
+          <p className="sidebar__logo-text">Gold Bot</p>
+          <p className="sidebar__logo-sub">XAUUSD · Panel</p>
         </div>
       </div>
 
       {/* Account selector */}
       {accounts && accounts.length > 0 && (
-        <div className="px-3 py-3 flex-shrink-0" style={{ borderBottom: '1px solid oklch(0.14 0 0)' }}>
-          <div className="relative" ref={dropdownRef}>
+        <div className="sidebar__account-section">
+          <div style={{ position: 'relative' }} ref={dropdownRef}>
             <button
               onClick={() => setAccountOpen(o => !o)}
-              className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-sm transition-colors duration-150"
+              className="sidebar__account-btn"
               style={{
-                background: 'oklch(0.11 0 0)',
-                border: '1px solid oklch(0.20 0 0)',
                 color: selectedAccount ? 'oklch(0.90 0 0)' : 'oklch(0.45 0 0)',
               }}
             >
               <Briefcase size={12} strokeWidth={1.5} style={{ color: 'oklch(0.42 0 0)', flexShrink: 0 }} />
               {selectedAccount ? (
-                <span className="flex-1 text-left truncate font-medium text-xs">{selectedAccount.display_name}</span>
+                <span style={{ flex: 1, textAlign: 'left', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500, fontSize: '0.75rem' }}>
+                  {selectedAccount.display_name}
+                </span>
               ) : (
-                <span className="flex-1 text-left text-xs">Select account…</span>
+                <span style={{ flex: 1, textAlign: 'left', fontSize: '0.75rem' }}>Select account…</span>
               )}
               <ChevronDown
                 size={12}
@@ -102,14 +83,7 @@ export function Sidebar() {
                 initial={{ opacity: 0, y: -4, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute left-0 right-0 top-full mt-1 rounded-md"
-                style={{
-                  zIndex: 100,
-                  background: 'oklch(0.14 0 0)',
-                  border: '1px solid oklch(0.22 0 0)',
-                  boxShadow: '0 8px 24px oklch(0 0 0 / 0.5)',
-                  overflow: 'hidden',
-                }}
+                className="sidebar__dropdown"
               >
                 {accounts.map(a => {
                   const isSelected = a.id === selectedAccountId
@@ -120,23 +94,20 @@ export function Sidebar() {
                         setSelectedAccountId(a.id)
                         setAccountOpen(false)
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-left transition-colors duration-100"
+                      className="sidebar__dropdown-item"
                       style={{
                         color: isSelected ? 'oklch(0.76 0.149 80)' : 'oklch(0.70 0 0)',
                         background: isSelected ? 'oklch(0.76 0.149 80 / 0.08)' : 'transparent',
                       }}
-                      onMouseEnter={e => {
-                        if (!isSelected) e.currentTarget.style.background = 'oklch(0.18 0 0)'
-                      }}
-                      onMouseLeave={e => {
-                        if (!isSelected) e.currentTarget.style.background = 'transparent'
-                      }}
                     >
                       <Briefcase size={11} strokeWidth={1.5} style={{ flexShrink: 0, opacity: 0.6 }} />
-                      <span className="flex-1 truncate">{a.display_name}</span>
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.display_name}</span>
                       <span
-                        className="text-[9px] font-medium px-1 py-0.5 rounded"
                         style={{
+                          fontSize: '9px',
+                          fontWeight: 500,
+                          padding: '2px 4px',
+                          borderRadius: '3px',
                           background: 'oklch(0.70 0.150 155 / 0.12)',
                           color: 'oklch(0.65 0.130 155)',
                         }}
@@ -153,46 +124,19 @@ export function Sidebar() {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
+      <nav className="sidebar__nav">
         {nav.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
-            className="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm relative"
-            style={({ isActive }) => ({
-              background: isActive ? 'oklch(0.76 0.149 80 / 0.08)' : 'transparent',
-              color: isActive ? 'oklch(0.82 0.100 80)' : 'oklch(0.50 0 0)',
-              transition: 'background 120ms, color 120ms',
-              fontWeight: isActive ? 500 : 400,
-            })}
-            onMouseEnter={e => {
-              const link = e.currentTarget as HTMLAnchorElement
-              if (!link.getAttribute('aria-current')) {
-                link.style.background = 'oklch(0.11 0 0)'
-                link.style.color = 'oklch(0.78 0 0)'
-              }
-            }}
-            onMouseLeave={e => {
-              const link = e.currentTarget as HTMLAnchorElement
-              if (!link.getAttribute('aria-current')) {
-                link.style.background = 'transparent'
-                link.style.color = 'oklch(0.50 0 0)'
-              }
-            }}
+            className={({ isActive }) =>
+              `sidebar__nav-link ${isActive ? 'sidebar__nav-link--active' : ''}`
+            }
           >
             {({ isActive }) => (
               <>
-                {isActive && (
-                  <span
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 rounded-r-full"
-                    style={{ background: 'oklch(0.76 0.149 80)' }}
-                  />
-                )}
-                <Icon
-                  size={15}
-                  strokeWidth={isActive ? 2 : 1.5}
-                  style={{ flexShrink: 0 }}
-                />
+                {isActive && <span className="sidebar__nav-indicator" />}
+                <Icon size={15} strokeWidth={isActive ? 2 : 1.5} style={{ flexShrink: 0 }} />
                 {label}
               </>
             )}
@@ -201,10 +145,10 @@ export function Sidebar() {
       </nav>
 
       {/* User footer */}
-      <div className="px-3 py-3 flex-shrink-0" style={{ borderTop: '1px solid oklch(0.14 0 0)' }}>
-        <div className="flex items-center gap-2.5 px-2 py-1.5 mb-1">
+      <div className="sidebar__footer">
+        <div className="sidebar__user">
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold"
+            className="sidebar__user-avatar"
             style={{
               background: user?.role === 'admin'
                 ? 'oklch(0.76 0.149 80 / 0.15)'
@@ -216,12 +160,10 @@ export function Sidebar() {
           >
             {user?.email?.[0]?.toUpperCase() ?? '?'}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate" style={{ color: 'oklch(0.80 0 0)' }}>
-              {user?.email}
-            </p>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p className="sidebar__user-email">{user?.email}</p>
             <span
-              className="text-[9px] font-semibold uppercase tracking-wide px-1 py-0.5 rounded"
+              className="sidebar__user-role"
               style={{
                 background: user?.role === 'admin'
                   ? 'oklch(0.76 0.149 80 / 0.10)'
@@ -236,19 +178,7 @@ export function Sidebar() {
           </div>
         </div>
 
-        <button
-          onClick={() => logout.mutate()}
-          className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-xs transition-colors duration-150"
-          style={{ color: 'oklch(0.38 0 0)' }}
-          onMouseEnter={e => {
-            e.currentTarget.style.color = 'oklch(0.62 0.180 25)'
-            e.currentTarget.style.background = 'oklch(0.57 0.200 25 / 0.07)'
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.color = 'oklch(0.38 0 0)'
-            e.currentTarget.style.background = 'transparent'
-          }}
-        >
+        <button onClick={() => logout.mutate()} className="sidebar__logout">
           <LogOut size={13} strokeWidth={1.5} />
           Sign out
         </button>

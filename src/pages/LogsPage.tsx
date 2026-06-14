@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAccountStore } from '@/store/accountStore'
 import { useWebSocketLogs } from '@/hooks/useWebSocketLogs'
-import { Terminal, ChevronsDown, Trash2, Wifi, WifiOff } from 'lucide-react'
+import { Terminal as TerminalIcon, ChevronsDown, Trash2, Wifi, WifiOff } from 'lucide-react'
 
 type Level = 'INFO' | 'WARN' | 'ERROR' | 'OTHER'
 
@@ -69,9 +69,9 @@ export function LogsPage() {
 
   if (!selectedAccountId) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <Terminal size={32} style={{ color: 'oklch(0.22 0 0)' }} strokeWidth={1} />
-        <p className="text-sm" style={{ color: 'oklch(0.38 0 0)' }}>
+      <div className="empty-state">
+        <TerminalIcon size={32} className="empty-state__icon" strokeWidth={1} />
+        <p className="empty-state__text">
           Select an account to view logs
         </p>
       </div>
@@ -79,25 +79,28 @@ export function LogsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-3" style={{ height: 'calc(100vh - 56px - 48px)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: 'calc(100vh - 56px - 48px)' }}>
       {/* Toolbar */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
         {/* Connection status */}
-        <div className="flex items-center gap-1.5 mr-2">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginRight: '8px' }}>
           {connected ? (
             <Wifi size={12} style={{ color: 'oklch(0.70 0.150 155)' }} strokeWidth={2} />
           ) : (
             <WifiOff size={12} style={{ color: 'oklch(0.42 0 0)' }} strokeWidth={2} />
           )}
           <span
-            className="text-xs font-medium"
-            style={{ color: connected ? 'oklch(0.60 0.120 155)' : 'oklch(0.38 0 0)' }}
+            style={{
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              color: connected ? 'oklch(0.60 0.120 155)' : 'oklch(0.38 0 0)'
+            }}
           >
             {connected ? 'Live' : 'Reconnecting…'}
           </span>
         </div>
 
-        <div className="w-px h-4 mx-1" style={{ background: 'oklch(0.20 0 0)' }} />
+        <div style={{ width: '1px', height: '16px', margin: '0 4px', background: 'oklch(0.20 0 0)' }} />
 
         {/* Level filters */}
         {filterConfig.map(({ level, activeStyle }) => (
@@ -105,19 +108,19 @@ export function LogsPage() {
             key={level}
             onClick={() => toggleFilter(level)}
             aria-pressed={activeFilters.has(level)}
-            className="px-2.5 py-1 rounded text-xs font-medium border transition-all duration-150"
+            className="filter-chip"
             style={activeFilters.has(level) ? activeStyle : inactiveStyle}
           >
             {level}
           </button>
         ))}
 
-        <div className="flex-1" />
+        <div style={{ flex: 1 }} />
 
         {/* Actions */}
         <button
           onClick={() => setAutoScroll(a => !a)}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-all duration-150"
+          className="btn"
           style={
             autoScroll
               ? {
@@ -133,7 +136,7 @@ export function LogsPage() {
         </button>
         <button
           onClick={clear}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium border transition-all duration-150"
+          className="btn"
           style={inactiveStyle}
           onMouseEnter={e => {
             e.currentTarget.style.color = 'oklch(0.62 0.180 25)'
@@ -150,14 +153,7 @@ export function LogsPage() {
       </div>
 
       {/* Terminal */}
-      <div
-        className="flex-1 overflow-y-auto rounded-xl p-4 leading-5 text-xs"
-        style={{
-          background: 'oklch(0.05 0 0)',
-          border: '1px solid oklch(0.15 0 0)',
-          fontFamily: "var(--font-mono)",
-        }}
-      >
+      <div className="terminal" style={{ flex: 1 }}>
         {filtered.length === 0 ? (
           <span style={{ color: 'oklch(0.25 0 0)' }}>
             {connected ? 'Waiting for log output…' : 'Connecting…'}
@@ -166,8 +162,9 @@ export function LogsPage() {
           filtered.map(line => (
             <div
               key={line.id}
-              className="whitespace-pre-wrap break-all"
               style={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-all',
                 ...levelStyle[line.level],
                 animation: 'fadeInLine 100ms cubic-bezier(0.16, 1, 0.3, 1)',
               }}

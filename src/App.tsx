@@ -6,6 +6,7 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { LogsPage } from '@/pages/LogsPage'
 import { TradesPage } from '@/pages/TradesPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { AuthExpiredListener } from '@/components/layout/AuthExpiredListener'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 1000 * 30 } }
@@ -15,6 +16,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <AuthExpiredListener />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route element={<AppShell />}>

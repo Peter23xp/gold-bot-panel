@@ -17,7 +17,7 @@ export function AppShell() {
   const { data: user, isLoading, isError } = useCurrentUser()
 
   if (isLoading) {
-    return <div className="min-h-screen" style={{ background: 'var(--bg)' }} />
+    return <div className="app-shell" />
   }
 
   if (isError || !user) {
@@ -25,15 +25,15 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+    <div className="app-shell">
       <Sidebar />
-      <div className="ml-60">
+      <div className="app-shell__main-wrapper">
         <TopBar title={title} />
-        <main className="pt-14 min-h-screen">
+        <main className="app-shell__content">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
-              className="p-6 max-w-[1280px] mx-auto"
+              className="app-shell__page"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
