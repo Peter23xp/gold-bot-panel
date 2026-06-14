@@ -1,18 +1,37 @@
-import { cn } from '@/lib/utils'
-
 interface MetricTileProps {
   label: string
   value: string
-  valueClass?: string
   sub?: string
+  valueStyle?: React.CSSProperties
 }
 
-export function MetricTile({ label, value, valueClass, sub }: MetricTileProps) {
+export function MetricTile({ label, value, sub, valueStyle }: MetricTileProps) {
   return (
-    <div className="bg-[oklch(0.11_0_0)] border border-[oklch(0.20_0_0)] rounded-lg p-4 flex flex-col gap-1">
-      <span className="text-xs text-[oklch(0.65_0_0)] font-medium uppercase tracking-wide">{label}</span>
-      <span className={cn('text-2xl font-bold text-[oklch(0.95_0_0)]', valueClass)}>{value}</span>
-      {sub && <span className="text-xs text-[oklch(0.42_0_0)]">{sub}</span>}
+    <div
+      className="rounded-xl p-4"
+      style={{
+        background: 'oklch(0.105 0 0)',
+        border: '1px solid oklch(0.18 0 0)',
+      }}
+    >
+      <p className="text-xs font-medium mb-2.5" style={{ color: 'oklch(0.42 0 0)' }}>
+        {label}
+      </p>
+      <p
+        className="text-2xl font-bold tracking-tight tabular-nums leading-none"
+        style={{
+          color: 'oklch(0.95 0 0)',
+          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          ...valueStyle,
+        }}
+      >
+        {value}
+      </p>
+      {sub && (
+        <p className="text-xs mt-2" style={{ color: 'oklch(0.38 0 0)' }}>
+          {sub}
+        </p>
+      )}
     </div>
   )
 }

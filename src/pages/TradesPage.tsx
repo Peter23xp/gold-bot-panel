@@ -1,13 +1,24 @@
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import { useAccountStore } from '@/store/accountStore'
 import { useTrades, useTradeSummary } from '@/hooks/useTrades'
 import { MetricTile } from '@/components/ui/MetricTile'
 import { formatProfit, formatDuration } from '@/lib/utils'
-import { Download, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Download, ChevronLeft, ChevronRight, History } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 type ResultFilter = 'win' | 'loss' | null
+
+const inputStyle: React.CSSProperties = {
+  background: 'oklch(0.12 0 0)',
+  border: '1px solid oklch(0.22 0 0)',
+  color: 'oklch(0.90 0 0)',
+  borderRadius: '8px',
+  padding: '6px 12px',
+  fontSize: '0.8125rem',
+  outline: 'none',
+}
 
 export function TradesPage() {
   const { selectedAccountId } = useAccountStore()
@@ -25,77 +36,249 @@ export function TradesPage() {
   })
 
   if (!selectedAccountId) {
-    return <div className="text-sm text-[oklch(0.42_0_0)]">Select an account to view trades</div>
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-3">
+        <History size={32} style={{ color: 'oklch(0.22 0 0)' }} strokeWidth={1} />
+        <p className="text-sm" style={{ color: 'oklch(0.38 0 0)' }}>
+          Select an account to view trades
+        </p>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-5">
+      {/* Summary tiles */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-5 gap-3"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        >
           <MetricTile label="Total Trades" value={String(summary.total_trades)} />
-          <MetricTile label="Win Rate" value={`${summary.win_rate_pct}%`} valueClass={summary.win_rate_pct >= 50 ? 'text-[oklch(0.70_0.150_155)]' : 'text-[oklch(0.57_0.200_25)]'} />
-          <MetricTile label="Total Profit" value={formatProfit(summary.total_profit)} valueClass={summary.total_profit >= 0 ? 'text-[oklch(0.70_0.150_155)]' : 'text-[oklch(0.57_0.200_25)]'} />
-          <MetricTile label="Best Trade" value={formatProfit(summary.best_trade)} valueClass="text-[oklch(0.70_0.150_155)]" />
-          <MetricTile label="Worst Trade" value={formatProfit(summary.worst_trade)} valueClass="text-[oklch(0.57_0.200_25)]" />
-        </div>
+          <MetricTile
+            label="Win Rate"
+            value={`${summary.win_rate_pct}%`}
+            valueStyle={{ color: summary.win_rate_pct >= 50 ? 'oklch(0.70 0.150 155)' : 'oklch(0.57 0.200 25)' }}
+          />
+          <MetricTile
+            label="Total Profit"
+            value={formatProfit(summary.total_profit)}
+            valueStyle={{ color: summary.total_profit >= 0 ? 'oklch(0.70 0.150 155)' : 'oklch(0.57 0.200 25)' }}
+          />
+          <MetricTile
+            label="Best Trade"
+            value={formatProfit(summary.best_trade)}
+            valueStyle={{ color: 'oklch(0.70 0.150 155)' }}
+          />
+          <MetricTile
+            label="Worst Trade"
+            value={formatProfit(summary.worst_trade)}
+            valueStyle={{ color: 'oklch(0.57 0.200 25)' }}
+          />
+        </motion.div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3">
-        <input type="date" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setPage(1) }}
-          className="bg-[oklch(0.11_0_0)] border border-[oklch(0.20_0_0)] rounded-md px-3 py-1.5 text-sm text-[oklch(0.95_0_0)] outline-none focus:border-[oklch(0.76_0.149_80)] transition-colors" />
-        <span className="text-[oklch(0.42_0_0)] text-xs">to</span>
-        <input type="date" value={dateTo} onChange={e => { setDateTo(e.target.value); setPage(1) }}
-          className="bg-[oklch(0.11_0_0)] border border-[oklch(0.20_0_0)] rounded-md px-3 py-1.5 text-sm text-[oklch(0.95_0_0)] outline-none focus:border-[oklch(0.76_0.149_80)] transition-colors" />
+      {/* Filter bar */}
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          type="date"
+          value={dateFrom}
+          onChange={e => { setDateFrom(e.target.value); setPage(1) }}
+          style={inputStyle}
+        />
+        <span className="text-xs" style={{ color: 'oklch(0.38 0 0)' }}>to</span>
+        <input
+          type="date"
+          value={dateTo}
+          onChange={e => { setDateTo(e.target.value); setPage(1) }}
+          style={inputStyle}
+        />
+
         <div className="flex gap-1">
-          {([null, 'win', 'loss'] as const).map(f => (
-            <button key={String(f)} onClick={() => { setResultFilter(f); setPage(1) }}
-              className={`px-2.5 py-1.5 rounded text-xs font-medium border transition-colors ${resultFilter === f ? 'border-[oklch(0.76_0.149_80)] text-[oklch(0.76_0.149_80)] bg-[oklch(0.76_0.149_80_/_0.1)]' : 'border-[oklch(0.20_0_0)] text-[oklch(0.42_0_0)] hover:text-[oklch(0.95_0_0)]'}`}>
-              {f === null ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+          {([null, 'win', 'loss'] as const).map(f => {
+            const active = resultFilter === f
+            const label = f === null ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)
+            const activeStyles: Record<string, React.CSSProperties> = {
+              null: {
+                color: 'oklch(0.80 0.149 80)',
+                background: 'oklch(0.76 0.149 80 / 0.10)',
+                borderColor: 'oklch(0.55 0.120 80)',
+              },
+              win: {
+                color: 'oklch(0.72 0.150 155)',
+                background: 'oklch(0.70 0.150 155 / 0.10)',
+                borderColor: 'oklch(0.55 0.130 155)',
+              },
+              loss: {
+                color: 'oklch(0.68 0.150 25)',
+                background: 'oklch(0.57 0.200 25 / 0.10)',
+                borderColor: 'oklch(0.50 0.180 25)',
+              },
+            }
+            return (
+              <button
+                key={String(f)}
+                onClick={() => { setResultFilter(f); setPage(1) }}
+                className="px-2.5 py-1.5 rounded text-xs font-medium border transition-all duration-150"
+                style={active ? activeStyles[String(f)] : {
+                  color: 'oklch(0.42 0 0)',
+                  background: 'transparent',
+                  borderColor: 'oklch(0.20 0 0)',
+                }}
+              >
+                {label}
+              </button>
+            )
+          })}
         </div>
-        <a href={`${API_URL}/trades/${selectedAccountId}/export`} download
-          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-[oklch(0.20_0_0)] text-[oklch(0.42_0_0)] hover:text-[oklch(0.95_0_0)] transition-colors">
-          <Download size={12} strokeWidth={1.5} /> Export CSV
+
+        <a
+          href={`${API_URL}/trades/${selectedAccountId}/export`}
+          download
+          className="ml-auto flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium border transition-all duration-150"
+          style={{ color: 'oklch(0.42 0 0)', borderColor: 'oklch(0.20 0 0)' }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLAnchorElement
+            el.style.color = 'oklch(0.85 0 0)'
+            el.style.borderColor = 'oklch(0.30 0 0)'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLAnchorElement
+            el.style.color = 'oklch(0.42 0 0)'
+            el.style.borderColor = 'oklch(0.20 0 0)'
+          }}
+        >
+          <Download size={12} strokeWidth={2} />
+          Export CSV
         </a>
       </div>
 
-      <div className="bg-[oklch(0.11_0_0)] border border-[oklch(0.20_0_0)] rounded-lg overflow-hidden">
+      {/* Table */}
+      <div
+        className="rounded-xl overflow-hidden"
+        style={{ background: 'oklch(0.105 0 0)', border: '1px solid oklch(0.18 0 0)' }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[oklch(0.15_0_0)]">
-                {['Date (UTC)','Ticket','Type','Lots','Open','Close','SL','TP','Profit','Duration'].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left text-xs text-[oklch(0.42_0_0)] font-semibold whitespace-nowrap">{h}</th>
+              <tr style={{ background: 'oklch(0.13 0 0)', borderBottom: '1px solid oklch(0.16 0 0)' }}>
+                {['Date (UTC)', 'Ticket', 'Type', 'Lots', 'Open', 'Close', 'SL', 'TP', 'Profit', 'Duration'].map(h => (
+                  <th
+                    key={h}
+                    className="px-4 py-2.5 text-left text-xs font-medium whitespace-nowrap"
+                    style={{ color: 'oklch(0.38 0 0)' }}
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {isLoading && <tr><td colSpan={10} className="px-4 py-8 text-center text-sm text-[oklch(0.42_0_0)]">Loading…</td></tr>}
-              {!isLoading && !trades?.items.length && <tr><td colSpan={10} className="px-4 py-8 text-center text-sm text-[oklch(0.42_0_0)]">No trades found</td></tr>}
+              {isLoading && (
+                <tr>
+                  <td colSpan={10} className="px-4 py-10 text-center text-sm" style={{ color: 'oklch(0.35 0 0)' }}>
+                    Loading…
+                  </td>
+                </tr>
+              )}
+              {!isLoading && !trades?.items.length && (
+                <tr>
+                  <td colSpan={10} className="px-4 py-10 text-center text-sm" style={{ color: 'oklch(0.35 0 0)' }}>
+                    No trades found
+                  </td>
+                </tr>
+              )}
               {trades?.items.map((trade, i) => (
-                <tr key={trade.id} className={`border-t border-[oklch(0.15_0_0)] hover:bg-[oklch(0.13_0_0)] transition-colors ${i % 2 === 0 ? '' : 'bg-[oklch(0.09_0_0_/_0.5)]'}`}>
-                  <td className="px-4 py-2.5 text-xs text-[oklch(0.42_0_0)] whitespace-nowrap">{new Date(trade.open_time).toISOString().replace('T',' ').slice(0,16)} UTC</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-[oklch(0.42_0_0)]">{trade.ticket}</td>
-                  <td className="px-4 py-2.5"><span className={trade.order_type === 'BUY' ? 'text-[oklch(0.70_0.150_155)]' : 'text-[oklch(0.57_0.200_25)]'}>{trade.order_type}</span></td>
-                  <td className="px-4 py-2.5 text-[oklch(0.65_0_0)]">{trade.volume}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-[oklch(0.65_0_0)]">{trade.price_open}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-[oklch(0.65_0_0)]">{trade.price_close ?? '—'}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-[oklch(0.42_0_0)]">{trade.sl ?? '—'}</td>
-                  <td className="px-4 py-2.5 font-mono text-xs text-[oklch(0.42_0_0)]">{trade.tp ?? '—'}</td>
-                  <td className={`px-4 py-2.5 font-mono text-xs font-medium ${(trade.profit ?? 0) >= 0 ? 'text-[oklch(0.70_0.150_155)]' : 'text-[oklch(0.57_0.200_25)]'}`}>{formatProfit(trade.profit)}</td>
-                  <td className="px-4 py-2.5 text-xs text-[oklch(0.42_0_0)]">{formatDuration(trade.duration_seconds)}</td>
+                <tr
+                  key={trade.id}
+                  style={{
+                    borderTop: '1px solid oklch(0.13 0 0)',
+                    background: i % 2 !== 0 ? 'oklch(0.09 0 0 / 0.4)' : 'transparent',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'oklch(0.13 0 0)' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = i % 2 !== 0 ? 'oklch(0.09 0 0 / 0.4)' : 'transparent' }}
+                >
+                  <td className="px-4 py-2.5 text-xs whitespace-nowrap" style={{ color: 'oklch(0.42 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {new Date(trade.open_time).toISOString().replace('T', ' ').slice(0, 16)} UTC
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.ticket}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <span
+                      className="text-xs font-semibold px-1.5 py-0.5 rounded"
+                      style={{
+                        background: trade.order_type === 'BUY' ? 'oklch(0.70 0.150 155 / 0.10)' : 'oklch(0.57 0.200 25 / 0.10)',
+                        color: trade.order_type === 'BUY' ? 'oklch(0.72 0.150 155)' : 'oklch(0.68 0.150 25)',
+                      }}
+                    >
+                      {trade.order_type}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.volume}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.price_open}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.55 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.price_close ?? '—'}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.sl ?? '—'}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {trade.tp ?? '—'}
+                  </td>
+                  <td
+                    className="px-4 py-2.5 text-xs font-semibold"
+                    style={{
+                      color: (trade.profit ?? 0) >= 0 ? 'oklch(0.70 0.150 155)' : 'oklch(0.57 0.200 25)',
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                  >
+                    {formatProfit(trade.profit)}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs" style={{ color: 'oklch(0.38 0 0)' }}>
+                    {formatDuration(trade.duration_seconds)}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
         {trades && trades.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[oklch(0.20_0_0)]">
-            <span className="text-xs text-[oklch(0.42_0_0)]">Page {trades.page} of {trades.pages} ({trades.total} trades)</span>
-            <div className="flex gap-2">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="p-1.5 rounded border border-[oklch(0.20_0_0)] text-[oklch(0.42_0_0)] hover:text-[oklch(0.95_0_0)] disabled:opacity-40 transition-colors"><ChevronLeft size={14} strokeWidth={1.5} /></button>
-              <button onClick={() => setPage(p => Math.min(trades.pages, p + 1))} disabled={page === trades.pages} className="p-1.5 rounded border border-[oklch(0.20_0_0)] text-[oklch(0.42_0_0)] hover:text-[oklch(0.95_0_0)] disabled:opacity-40 transition-colors"><ChevronRight size={14} strokeWidth={1.5} /></button>
+          <div
+            className="flex items-center justify-between px-4 py-3"
+            style={{ borderTop: '1px solid oklch(0.16 0 0)' }}
+          >
+            <span className="text-xs" style={{ color: 'oklch(0.38 0 0)' }}>
+              Page {trades.page} of {trades.pages} &middot; {trades.total} trades
+            </span>
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-1.5 rounded border transition-all duration-150 disabled:opacity-30"
+                style={{ borderColor: 'oklch(0.20 0 0)', color: 'oklch(0.45 0 0)' }}
+                onMouseEnter={e => { if (page > 1) e.currentTarget.style.color = 'oklch(0.85 0 0)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'oklch(0.45 0 0)' }}
+              >
+                <ChevronLeft size={14} strokeWidth={2} />
+              </button>
+              <button
+                onClick={() => setPage(p => Math.min(trades.pages, p + 1))}
+                disabled={page === trades.pages}
+                className="p-1.5 rounded border transition-all duration-150 disabled:opacity-30"
+                style={{ borderColor: 'oklch(0.20 0 0)', color: 'oklch(0.45 0 0)' }}
+                onMouseEnter={e => { if (page < trades.pages) e.currentTarget.style.color = 'oklch(0.85 0 0)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = 'oklch(0.45 0 0)' }}
+              >
+                <ChevronRight size={14} strokeWidth={2} />
+              </button>
             </div>
           </div>
         )}

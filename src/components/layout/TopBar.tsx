@@ -7,9 +7,20 @@ interface TopBarProps { title: string }
 export function TopBar({ title }: TopBarProps) {
   const { selectedAccountId } = useAccountStore()
   const { data: status } = useBotStatus(selectedAccountId)
+
   return (
-    <header className="fixed left-60 right-0 top-0 h-14 bg-[oklch(0.09_0_0_/_0.95)] backdrop-blur-sm border-b border-[oklch(0.20_0_0)] flex items-center px-6 justify-between z-10">
-      <h1 className="text-base font-semibold text-[oklch(0.95_0_0)]">{title}</h1>
+    <header
+      className="fixed left-60 right-0 top-0 h-14 flex items-center px-6 justify-between z-10"
+      style={{
+        background: 'oklch(0.07 0 0 / 0.92)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid oklch(0.16 0 0)',
+      }}
+    >
+      <h1 className="text-sm font-semibold" style={{ color: 'oklch(0.90 0 0)' }}>
+        {title}
+      </h1>
       {status && <StatusBadge status={status.status} />}
     </header>
   )

@@ -1,33 +1,56 @@
-import { cn } from '@/lib/utils'
-
 type Status = 'running' | 'stopped' | 'error'
 
-const config = {
+const config: Record<Status, {
+  label: string
+  dotStyle: React.CSSProperties
+  dotAnimation?: string
+  style: React.CSSProperties
+}> = {
   running: {
-    label: 'RUNNING',
-    dot: 'bg-[oklch(0.70_0.150_155)] animate-[pulse-dot_2s_ease-in-out_infinite]',
-    text: 'text-[oklch(0.70_0.150_155)]',
-    bg: 'bg-[oklch(0.70_0.150_155_/_0.12)]',
+    label: 'Running',
+    dotStyle: { background: 'oklch(0.70 0.150 155)' },
+    dotAnimation: 'pulse-dot 2s ease-in-out infinite',
+    style: {
+      background: 'oklch(0.70 0.150 155 / 0.10)',
+      color: 'oklch(0.72 0.150 155)',
+      border: '1px solid oklch(0.70 0.150 155 / 0.20)',
+    },
   },
   stopped: {
-    label: 'STOPPED',
-    dot: 'bg-[oklch(0.42_0_0)]',
-    text: 'text-[oklch(0.65_0_0)]',
-    bg: 'bg-[oklch(0.42_0_0_/_0.15)]',
+    label: 'Stopped',
+    dotStyle: { background: 'oklch(0.38 0 0)' },
+    style: {
+      background: 'oklch(0.38 0 0 / 0.12)',
+      color: 'oklch(0.52 0 0)',
+      border: '1px solid oklch(0.28 0 0)',
+    },
   },
   error: {
-    label: 'ERROR',
-    dot: 'bg-[oklch(0.57_0.200_25)] animate-[flash-dot_1s_ease-in-out_infinite]',
-    text: 'text-[oklch(0.57_0.200_25)]',
-    bg: 'bg-[oklch(0.57_0.200_25_/_0.12)]',
+    label: 'Error',
+    dotStyle: { background: 'oklch(0.57 0.200 25)' },
+    dotAnimation: 'flash-dot 1s ease-in-out infinite',
+    style: {
+      background: 'oklch(0.57 0.200 25 / 0.10)',
+      color: 'oklch(0.68 0.150 25)',
+      border: '1px solid oklch(0.57 0.200 25 / 0.20)',
+    },
   },
 }
 
 export function StatusBadge({ status }: { status: Status }) {
   const c = config[status]
   return (
-    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium', c.bg, c.text)}>
-      <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', c.dot)} />
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+      style={c.style}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        style={{
+          ...c.dotStyle,
+          animation: c.dotAnimation,
+        }}
+      />
       {c.label}
     </span>
   )
