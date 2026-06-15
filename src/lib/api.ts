@@ -3,7 +3,10 @@ import axios from 'axios'
 /**
  * API client for Gold Bot Panel.
  *
- * In development, Vite proxies /api/* → backend (same-origin, cookies work).
+ * The backend authenticates via httpOnly cookies (primary) or
+ * Authorization: Bearer header (fallback, added in deps.py).
+ *
+ * In development, Vite proxies /api/* → backend (same-origin).
  * In production (Vercel), VITE_API_URL points to the real backend.
  */
 const isDev = import.meta.env.DEV
@@ -14,7 +17,10 @@ export const api = axios.create({
   withCredentials: true,
 })
 
-// Store the access token in memory for Bearer auth fallback
+// ---------- In-memory token storage ----------
+// The backend sets httpOnly cookies, but those only work over HTTPS with
+// samesite=none + secure=true. As a fallback we store the tokens from the
+// login response and attach them as Authorization: Bearer headers.
 let accessToken: string | null = null
 let refreshToken: string | null = null
 
@@ -32,7 +38,7 @@ export function getAccessToken() {
   return accessToken
 }
 
-// Attach Bearer token to every request if available
+// Attach Bearer token to every request
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
@@ -49,7 +55,6 @@ api.interceptors.response.use(
     const requestUrl = error.config?.url || ''
     const isAuthCall = AUTH_URLS.some(u => requestUrl.includes(u))
 
-    // Don't intercept auth calls — let the caller handle errors directly
     if (isAuthCall || error.config._retry) {
       return Promise.reject(error)
     }
@@ -57,6 +62,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && refreshToken) {
       error.config._retry = true
       try {
+        // Send refresh_token in body (backend now accepts both cookie and body)
         const res = await api.post('/auth/refresh', { refresh_token: refreshToken })
         const newTokens = res.data
         accessToken = newTokens.access_token
@@ -67,15 +73,12 @@ api.interceptors.response.use(
         error.config.headers.Authorization = `Bearer ${accessToken}`
         return api(error.config)
       } catch {
-        // Refresh failed — clear tokens, redirect via React Router
         clearTokens()
-        // Dispatch a custom event instead of hard redirect to keep console logs
         window.dispatchEvent(new CustomEvent('auth:expired'))
         return Promise.reject(error)
       }
     }
 
-    // No refresh token available and got 401 → session expired
     if (error.response?.status === 401) {
       clearTokens()
       window.dispatchEvent(new CustomEvent('auth:expired'))
